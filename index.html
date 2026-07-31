@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Твой сегодняшний ресурс</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-bg: #ffffff;
+      --color-text: #1a1a1a;
+      --color-text-muted: #6b7280;
+      --color-border: #e5e7eb;
+      --color-card-hover: #f9fafb;
+      --color-accent: #374151;
+      --font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+      --radius: 16px;
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+      --max-width: 480px;
+      --spacing: 24px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: var(--spacing);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .app {
+      width: 100%;
+      max-width: var(--max-width);
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.is-active {
+      display: block;
+    }
+
+    .section.is-visible {
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ——— Экран приветствия ——— */
+
+    .welcome {
+      text-align: center;
+    }
+
+    .welcome__title {
+      font-size: clamp(1.75rem, 5vw, 2.25rem);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .welcome__subtitle {
+      font-size: 1.05rem;
+      color: var(--color-text-muted);
+      margin-bottom: 40px;
+      max-width: 360px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ——— Кнопки ——— */
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 14px 32px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+
+    .btn--primary {
+      background: var(--color-accent);
+      color: #fff;
+    }
+
+    .btn--primary:hover {
+      background: #1f2937;
+    }
+
+    .btn--primary:active {
+      transform: scale(0.98);
+    }
+
+    .btn--ghost {
+      background: transparent;
+      color: var(--color-text-muted);
+      padding: 10px 16px;
+      font-size: 0.9rem;
+      margin-top: 24px;
+    }
+
+    .btn--ghost:hover {
+      color: var(--color-text);
+    }
+
+    /* ——— Выбор состояния ——— */
+
+    .states__heading {
+      font-size: 1.25rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .states__hint {
+      text-align: center;
+      color: var(--color-text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 28px;
+    }
+
+    .states__grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .state-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 20px 12px;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--color-text);
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .state-card:hover {
+      background: var(--color-card-hover);
+      border-color: #d1d5db;
+    }
+
+    .state-card__emoji {
+      font-size: 1.75rem;
+      line-height: 1;
+    }
+
+    /* ——— Результат ——— */
+
+    .result {
+      text-align: center;
+    }
+
+    .result__card {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 36px 28px;
+    }
+
+    .result__emoji {
+      font-size: 2.5rem;
+      margin-bottom: 16px;
+    }
+
+    .result__state {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .result__message {
+      font-size: 1.05rem;
+      color: var(--color-text-muted);
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <!-- Экран 1: приветствие -->
+    <section id="welcome" class="section welcome is-active is-visible">
+      <h1 class="welcome__title">Твой сегодняшний ресурс</h1>
+      <p class="welcome__subtitle">
+        Сегодняшнее состояние не бывает правильным или неправильным.
+        Это просто точка, из которой начинается движение.
+      </p>
+      <button type="button" class="btn btn--primary" id="btn-start">Начать</button>
+    </section>
+
+    <!-- Экран 2: выбор состояния -->
+    <section id="states" class="section states">
+      <h2 class="states__heading">Как ты себя чувствуешь?</h2>
+      <p class="states__hint">Выбери то, что откликается прямо сейчас</p>
+      <div class="states__grid" id="states-grid"></div>
+    </section>
+
+    <!-- Экран 3: поддерживающий текст -->
+    <section id="result" class="section result">
+      <div class="result__card">
+        <div class="result__emoji" id="result-emoji"></div>
+        <h2 class="result__state" id="result-state"></h2>
+        <p class="result__message" id="result-message"></p>
+      </div>
+      <button type="button" class="btn btn--ghost" id="btn-back">Выбрать другое состояние</button>
+    </section>
+  </main>
+
+  <script>
+    const STATES = [
+      {
+        id: 'calm',
+        emoji: '🌿',
+        label: 'Спокойствие',
+        message: 'Спокойствие — это уже ресурс. Не нужно никуда спешить. Просто будь здесь, в этом моменте.',
+      },
+      {
+        id: 'joy',
+        emoji: '☀️',
+        label: 'Радость',
+        message: 'Радость заслуживает места в твоём дне. Позволь себе её заметить и прожить — без оправданий.',
+      },
+      {
+        id: 'fatigue',
+        emoji: '🌧',
+        label: 'Усталость',
+        message: 'Усталость — это сигнал, а не слабость. Сегодня можно двигаться медленнее и беречь себя.',
+      },
+      {
+        id: 'anxiety',
+        emoji: '🌊',
+        label: 'Тревога',
+        message: 'Тревога говорит о том, что тебе не всё равно. Дыши. Ты справляешься с этим моментом.',
+      },
+      {
+        id: 'inspiration',
+        emoji: '✨',
+        label: 'Вдохновение',
+        message: 'Вдохновение — искра, с которой можно начать. Доверься ей, даже если первый шаг будет маленьким.',
+      },
+      {
+        id: 'anticipation',
+        emoji: '🌱',
+        label: 'Ожидание',
+        message: 'Ожидание — это пространство между «было» и «будет». В нём тоже можно найти опору.',
+      },
+    ];
+
+    const sections = {
+      welcome: document.getElementById('welcome'),
+      states: document.getElementById('states'),
+      result: document.getElementById('result'),
+    };
+
+    const statesGrid = document.getElementById('states-grid');
+    const resultEmoji = document.getElementById('result-emoji');
+    const resultState = document.getElementById('result-state');
+    const resultMessage = document.getElementById('result-message');
+
+    function showSection(name) {
+      Object.values(sections).forEach((section) => {
+        section.classList.remove('is-active', 'is-visible');
+      });
+      const target = sections[name];
+      target.classList.add('is-active');
+      requestAnimationFrame(() => target.classList.add('is-visible'));
+    }
+
+    function renderStateCards() {
+      statesGrid.innerHTML = STATES.map((state) => `
+        <button type="button" class="state-card" data-id="${state.id}">
+          <span class="state-card__emoji">${state.emoji}</span>
+          <span>${state.label}</span>
+        </button>
+      `).join('');
+    }
+
+    function selectState(id) {
+      const state = STATES.find((s) => s.id === id);
+      if (!state) return;
+
+      resultEmoji.textContent = state.emoji;
+      resultState.textContent = state.label;
+      resultMessage.textContent = state.message;
+      showSection('result');
+    }
+
+    document.getElementById('btn-start').addEventListener('click', () => {
+      showSection('states');
+    });
+
+    document.getElementById('btn-back').addEventListener('click', () => {
+      showSection('states');
+    });
+
+    statesGrid.addEventListener('click', (event) => {
+      const card = event.target.closest('.state-card');
+      if (card) selectState(card.dataset.id);
+    });
+
+    renderStateCards();
+  </script>
+</body>
+</html>
