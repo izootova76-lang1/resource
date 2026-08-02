@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --color-bg: #FAFAF8;
+      --color-bg: #ffffff;
       --color-text: #1a1a1a;
       --color-text-muted: #6b7280;
       --color-border: #e5e7eb;
@@ -165,26 +165,12 @@
       font-size: 0.95rem;
       font-weight: 500;
       color: var(--color-text);
-      transition: background 0.2s ease, border-color 0.2s ease, opacity 0.25s ease, box-shadow 0.25s ease;
+      transition: background 0.2s ease, border-color 0.2s ease;
     }
 
-    .state-card:hover:not(.is-dimmed):not(.is-selected) {
+    .state-card:hover {
       background: var(--color-card-hover);
       border-color: #d1d5db;
-    }
-
-    .states__grid.is-locked {
-      pointer-events: none;
-    }
-
-    .state-card.is-selected {
-      border-color: #9ca3af;
-      background: var(--color-card-hover);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    }
-
-    .state-card.is-dimmed {
-      opacity: 0.4;
     }
 
     .state-card__emoji {
@@ -233,13 +219,13 @@
         Сегодняшнее состояние не бывает правильным или неправильным.
         Это просто точка, из которой начинается движение.
       </p>
-      <button type="button" class="btn btn--primary" id="btn-start">Сделать паузу</button>
+      <button type="button" class="btn btn--primary" id="btn-start">Начать</button>
     </section>
 
     <!-- Экран 2: выбор состояния -->
     <section id="states" class="section states">
-      <h2 class="states__heading">Что сейчас ближе?</h2>
-      <p class="states__hint">Выбери то, что сейчас откликается</p>
+      <h2 class="states__heading">Как ты себя чувствуешь?</h2>
+      <p class="states__hint">Выбери то, что откликается прямо сейчас</p>
       <div class="states__grid" id="states-grid"></div>
     </section>
 
@@ -250,55 +236,47 @@
         <h2 class="result__state" id="result-state"></h2>
         <p class="result__message" id="result-message"></p>
       </div>
-      <button type="button" class="btn btn--ghost" id="btn-back">Вернуться к выбору</button>
+      <button type="button" class="btn btn--ghost" id="btn-back">Выбрать другое состояние</button>
     </section>
   </main>
 
   <script>
-    const SELECT_DELAY_MS = 750;
-
     const STATES = [
       {
         id: 'calm',
         emoji: '🌿',
         label: 'Спокойствие',
-        resultTitle: 'Сейчас рядом спокойствие',
-        message: 'Когда рядом спокойствие, день может казаться тише обычного. Не обязательно наполнять эту тишину чем-то ещё. Иногда она уже и есть то место, из которого становится виднее.',
+        message: 'Спокойствие — это уже ресурс. Не нужно никуда спешить. Просто будь здесь, в этом моменте.',
       },
       {
         id: 'joy',
         emoji: '☀️',
         label: 'Радость',
-        resultTitle: 'Сейчас рядом радость',
-        message: 'Радость не всегда бывает громкой. Иногда это лёгкость в теле, тёплая мысль или мгновение, которое не хочется объяснять. Можно просто позволить ему быть.',
+        message: 'Радость заслуживает места в твоём дне. Позволь себе её заметить и прожить — без оправданий.',
       },
       {
         id: 'fatigue',
         emoji: '🌧',
         label: 'Усталость',
-        resultTitle: 'Сейчас рядом усталость',
-        message: 'Усталость не всегда говорит о слабости. Иногда она становится заметной только после того, как человек слишком долго нёс больше, чем успевал замечать. Что сейчас могло бы стать немного бережнее?',
+        message: 'Усталость — это сигнал, а не слабость. Сегодня можно двигаться медленнее и беречь себя.',
       },
       {
         id: 'anxiety',
         emoji: '🌊',
         label: 'Тревога',
-        resultTitle: 'Сейчас рядом тревога',
-        message: 'Тревога может занимать много внутреннего пространства, но она всё равно не становится всей картиной. Возможно, рядом с ней есть и что-то ещё — пусть пока совсем небольшое. Что удаётся заметить?',
+        message: 'Тревога говорит о том, что тебе не всё равно. Дыши. Ты справляешься с этим моментом.',
       },
       {
         id: 'inspiration',
         emoji: '✨',
         label: 'Вдохновение',
-        resultTitle: 'Сейчас рядом вдохновение',
-        message: 'Вдохновение не всегда приходит большим замыслом. Иногда это короткая искра — мысль, образ или едва заметное желание. Куда сейчас направлен её свет?',
+        message: 'Вдохновение — искра, с которой можно начать. Доверься ей, даже если первый шаг будет маленьким.',
       },
       {
         id: 'anticipation',
         emoji: '🌱',
         label: 'Ожидание',
-        resultTitle: 'Сейчас рядом ожидание',
-        message: 'Ожидание — пространство между „уже" и „ещё не". В нём не всегда можно увидеть, что будет дальше. Но иногда именно здесь становится заметно, что уже меняется внутри.',
+        message: 'Ожидание — это пространство между «было» и «будет». В нём тоже можно найти опору.',
       },
     ];
 
@@ -312,9 +290,6 @@
     const resultEmoji = document.getElementById('result-emoji');
     const resultState = document.getElementById('result-state');
     const resultMessage = document.getElementById('result-message');
-
-    let isSelecting = false;
-    let selectTimeout = null;
 
     function showSection(name) {
       Object.values(sections).forEach((section) => {
@@ -334,45 +309,14 @@
       `).join('');
     }
 
-    function resetStateSelection() {
-      if (selectTimeout) {
-        clearTimeout(selectTimeout);
-        selectTimeout = null;
-      }
-      isSelecting = false;
-      statesGrid.classList.remove('is-locked');
-      statesGrid.querySelectorAll('.state-card').forEach((card) => {
-        card.classList.remove('is-selected', 'is-dimmed');
-      });
-    }
-
     function selectState(id) {
-      if (isSelecting) return;
-
       const state = STATES.find((s) => s.id === id);
       if (!state) return;
 
-      const selectedCard = statesGrid.querySelector(`.state-card[data-id="${id}"]`);
-      if (!selectedCard) return;
-
-      isSelecting = true;
-      statesGrid.classList.add('is-locked');
-
-      statesGrid.querySelectorAll('.state-card').forEach((card) => {
-        if (card === selectedCard) {
-          card.classList.add('is-selected');
-        } else {
-          card.classList.add('is-dimmed');
-        }
-      });
-
-      selectTimeout = setTimeout(() => {
-        resultEmoji.textContent = state.emoji;
-        resultState.textContent = state.resultTitle;
-        resultMessage.textContent = state.message;
-        resetStateSelection();
-        showSection('result');
-      }, SELECT_DELAY_MS);
+      resultEmoji.textContent = state.emoji;
+      resultState.textContent = state.label;
+      resultMessage.textContent = state.message;
+      showSection('result');
     }
 
     document.getElementById('btn-start').addEventListener('click', () => {
@@ -380,7 +324,6 @@
     });
 
     document.getElementById('btn-back').addEventListener('click', () => {
-      resetStateSelection();
       showSection('states');
     });
 
